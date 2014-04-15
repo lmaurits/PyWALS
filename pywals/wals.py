@@ -3,8 +3,8 @@ import sqlite3
 import tempfile
 import urllib2
 
-from language import Language
-import walszipparser
+from pywals.language import Language
+import pywals.walszipparser as walszipparser
 
 class WALS:
 
