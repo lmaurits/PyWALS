@@ -130,6 +130,16 @@ class WALS:
 
         return lang
 
+    def get_all_languages(self):
+
+        """Return a list of Language objects corresponding to all the
+        languages in WALS."""
+
+        self._cur.execute("""SELECT wals_code FROM languages""")
+        code = self._cur.fetchone()[0]
+        language = self._lang_from_code(code)
+        return language
+
     def get_language_by_name(self, name):
 
         """Return a Language object corresponding to the language with the
