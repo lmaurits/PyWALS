@@ -104,6 +104,9 @@ class WALS:
         self._cur.execute('''SELECT COUNT(id) FROM features''')
         self.feature_count = self._cur.fetchone()[0]
 
+    # LANGUAGE RELATED STUFF
+    ##############################
+
     def _lang_from_code(self, code):
 
         """Return a Language object corresponding to the language with the
@@ -171,3 +174,20 @@ class WALS:
         codes = [code[0] for code in self._cur.fetchall()]
         languages = [self._lang_from_code(code) for code in codes]
         return languages
+
+    # FEATURE RELATED STUFF
+    ##############################
+
+    def get_feature_distribution(self, feature, family=None):
+
+        """Return a tuple structure representing the distribution over
+        values for the given feature.  If a family is provided, return the
+        distribution for languages in that family only."""
+       
+        if family:
+            self._cur.execute("""SELECT value_id, COUNT(value_id) as count FROM data_points WHERE feature_id=? AND wals_code IN (SELECT wals_code FROM languages WHERE family=?)GROUP BY value_id ORDER BY count DESC""", (feature,family))
+        else:
+            self._cur.execute("""SELECT value_id, COUNT(value_id) as count FROM data_points WHERE feature_id=? GROUP BY value_id ORDER BY count DESC""", (feature,))
+        dist = self._cur.fetchall()
+        dist = [(self._value_id_to_name[feature][value], count) for value, count in dist]
+        return dist
