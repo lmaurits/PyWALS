@@ -103,7 +103,7 @@ def populate_languages_table(data, cursor):
     corresponding to languages."""
 
     for datum in data:
-        cursor.execute("""INSERT INTO languages VALUES (?, ?, ?, ?, ?, ?, ?,?)""", (unicode(datum["wals code"],"utf8"), unicode(datum["name"],"utf8"), float(datum["latitude"]) if datum["latitude"] else None, float(datum["longitude"]) if datum["longitude"] else None, unicode(datum["genus"],"utf8"), unicode(datum["family"],"utf8"), unicode(datum["subfamily"],"utf8"), unicode(datum["iso codes"],"utf8")))
+        cursor.execute("""INSERT INTO languages VALUES (?, ?, ?, ?, ?, ?, ?,?)""", (unicode(datum["wals code"],"utf8"), unicode(datum["name"],"utf8"), float(datum["latitude"]) if datum["latitude"] else None, float(datum["longitude"]) if datum["longitude"] else None, unicode(datum["genus"],"utf8"), unicode(datum["family"],"utf8"), "", unicode(datum["iso codes"],"utf8")))
 
 def populate_features_table(data, cursor):
 
