@@ -1,5 +1,3 @@
-import sqlite3
-
 def create_languages_table(conn, cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS languages(
                 wals_code TEXT PRIMARY KEY,
