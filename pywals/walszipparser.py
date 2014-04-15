@@ -35,18 +35,14 @@ def parse_new_wals_data(zipfile_handle):
     data["datapoints"] = []
     fp = zipfile_handle.open("language.csv", "r")
     reader = csv.reader(fp)
-    fieldnames = reader.next()
-    features = fieldnames[8:]
+    features = reader.next()[8:]
     data["features"] = [dict(zip(["id", "name"], [feature.split(" ", 1)[0], feature.split(" ", 1)[1]])) for feature in features]
     feature_codes = [feature["id"] for feature in data["features"]]
     for line in reader:
-#        print line
-        lang_details = line[0:8]
-        feature_details = line[8:]
-        wals_code, iso_code, glottocode, name, latitude, longitude, genus, family = lang_details
-        data["languages"].append(dict(zip(["wals code", "name", "latitude", "longitude", "genus", "family", "subfamily", "iso codes"], [wals_code, name, latitude, longitude, genus, family, "", iso_code])))
+        lang_details, feature_details = line[0:8], line[8:]
+        data["languages"].append(dict(zip(["wals code", "iso codes", "glottocode", "name", "latitude", "longitude", "genus", "family"], lang_details)))
         datapoint = {}
-        datapoint["wals_code"] = wals_code
+        datapoint["wals_code"] = lang_details[0]
         for feature_code, value in zip(feature_codes, feature_details):
             if value:
                 value_id, long_desc = value.split(" ", 1)
@@ -56,7 +52,6 @@ def parse_new_wals_data(zipfile_handle):
                 if valdict not in data["values"]:
                     data["values"].append(valdict)
         data["datapoints"].append(datapoint)
-#        print data["datapoints"]
             
     fp.close()
     return data
