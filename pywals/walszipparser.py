@@ -1,3 +1,6 @@
+"""Functions to parse the .zip file which is downloadable from wals.info
+and insert all the corresponding data into an SQLite database."""
+
 import csv
 import zipfile
 
@@ -14,20 +17,37 @@ def populate_db(cursor, filename):
     sqlmodel.create_indices(cursor)
     
 def parse_wals_data(zipfile_handle):
-    # Build a data structure representing all the WALS data
-    # This structure is a dictionary with one key/value pair per file of WALS data
-    # The dictionary keys are the filenames (e.g. "languages", "features", etc.)
-    # The dictionary values are lists of dictionaries
-    # Each dictionary in a main dictionary value list represents one line from the file
-    # The keys are the column headers, the values are the column contents
 
-    print zipfile_handle.namelist()
+    """Parse the files in the passed in zipfile.ZipFile object and return
+    a data-structure representing all the WALS data."""
+
+    """The returned structure is a dictionary with one key/value pair per
+    file of WALS data.  The dictionary keys are the filenames (e.g.
+    "languages", "features", etc. - note these filenames do not exist in
+    newere WALS releases).  The dictionary values are lists of dictionaries.
+    Each dictionary in a main dictionary value list represents one line
+    from the file.  The keys are the column headers, the values are the
+    column contents."""
+
     if len(zipfile_handle.namelist()) == 2:
+        # Assume new-style WALS .zip file with just languages.csv
         return parse_new_wals_data(zipfile_handle)
     elif len(zipfile_handle.namelist()) == 5:
+        # Assume old-style WALS .zip file with many separage .csv files
         return parse_old_wals_data(zipfile_handle)
 
 def parse_new_wals_data(zipfile_handle):
+
+    """Parse a new-style WALS .zip file and return a data-structure
+    representing all the WALS data."""
+
+    """This function is a bit ugly.  The SQLite database structure used by
+    PyWALS was based on the old-style WALS .csv files, and the new single
+    .csv file has all that data mashed together in a fairly unstructured way
+    (e.g. feature codes and names are not explicitly separated, so we have to
+    do that.).  One day it may make sense to restructure the SQLite database
+    to match the new format, but maybe not."""
+
     data = {}
     data["languages"] = []
     data["features"] = []
@@ -57,6 +77,14 @@ def parse_new_wals_data(zipfile_handle):
     return data
 
 def parse_old_wals_data(zipfile_handle):
+
+    """Parse an old-style WALS .zip file and return a data-structure
+    representing all the WALS data."""
+
+    """This function is pretty straight-forward, because the SQLite database
+    structure used by PyWALS was based on the old-style WALS .csv files, so
+    the mapping is very direct."""
+
     data = {}
     filenames = "languages features values datapoints".split()
     for filename in filenames:
@@ -70,18 +98,34 @@ def parse_old_wals_data(zipfile_handle):
     return data
 
 def populate_languages_table(data, cursor):
+
+    """Insert rows into the language table, given a list of dictionaries
+    corresponding to languages."""
+
     for datum in data:
         cursor.execute("""INSERT INTO languages VALUES (?, ?, ?, ?, ?, ?, ?,?)""", (unicode(datum["wals code"],"utf8"), unicode(datum["name"],"utf8"), float(datum["latitude"]) if datum["latitude"] else None, float(datum["longitude"]) if datum["longitude"] else None, unicode(datum["genus"],"utf8"), unicode(datum["family"],"utf8"), unicode(datum["subfamily"],"utf8"), unicode(datum["iso codes"],"utf8")))
 
 def populate_features_table(data, cursor):
+
+    """Insert rows into the feature table, given a list of dictionaries
+    corresponding to features."""
+
     for datum in data:
         cursor.execute("""INSERT INTO features VALUES (?, ?)""", (datum["id"], unicode(datum["name"],"utf8")))
 
 def populate_values_table(data, cursor):
+
+    """Insert rows into the values_ table, given a list of dictionaries
+    corresponding to values."""
+
     for datum in data:
         cursor.execute("""INSERT INTO values_ VALUES (?, ?, ?, ?)""", (datum["feature_id"], int(datum["value_id"]), unicode(datum["description"],"utf8"), unicode(datum["long description"],"utf8")))
 
 def populate_data_table(data, cursor):
+
+    """Insert rows into the data_points table, given a list of dictionaries
+    corresponding to language-feature-value points."""
+
     for datum in data:
         keys = datum.keys()
         keys.remove("wals_code")
