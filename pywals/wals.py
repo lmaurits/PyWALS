@@ -8,6 +8,9 @@ import pywals.walszipparser as walszipparser
 
 class WALS:
 
+    """Object providing an interface to the WALS database, from which
+    objects corresponding to languages can be extracted."""
+
     def __init__(self, dbfile=None, walsfile=None, url=None):
 
         if not dbfile and not walsfile and not url:
@@ -63,10 +66,17 @@ class WALS:
         self._preprocess()
 
     def _preprocess(self):
+
+        """Compute various functions of the database."""
+
         self._build_translations()
         self._update_counts()
 
     def _build_translations(self):
+
+        """Build dictionaries which translate back and forward between
+        codes and human-readable names for features and feature values."""
+
         self._cur.execute('''SELECT id, name FROM features''')
         for id_, name in self._cur.fetchall():
             self._feature_id_to_name[id_] = name
@@ -81,12 +91,18 @@ class WALS:
 
     def _update_counts(self):
 
+        """Count number of languages, features etc. in database."""
+
         self._cur.execute('''SELECT COUNT(wals_code) FROM languages''')
         self.language_count = self._cur.fetchone()[0]
         self._cur.execute('''SELECT COUNT(id) FROM features''')
         self.feature_count = self._cur.fetchone()[0]
 
     def _lang_from_code(self, code):
+
+        """Return a Language object corresponding to the language with the
+        provided WALS code."""
+
         lang = Language(self)
         self._cur.execute('''SELECT * FROM languages WHERE wals_code=?''',(code,))
         results = self._cur.fetchone()
@@ -109,18 +125,30 @@ class WALS:
         return lang
 
     def get_language_by_name(self, name):
+
+        """Return a Language object corresponding to the language with the
+        provided name."""
+
         self._cur.execute("""SELECT wals_code FROM languages WHERE name=?""", (name,))
         code = self._cur.fetchone()[0]
         language = self._lang_from_code(code)
         return language
 
     def get_languages_by_family(self, family):
+
+        """Return a list of Language objects corresponding to the languages
+        in the provided language family."""
+
         self._cur.execute("""SELECT wals_code FROM languages WHERE family=?""", (family,))
         codes = [code[0] for code in self._cur.fetchall()]
         languages = [self._lang_from_code(code) for code in codes]
         return languages
 
     def get_languages_by_feature_value(self, feature, value):
+
+        """Return a list of Language objects corresponding to the languages
+        with the given value for the given feature."""
+
         feature_id = feature
         value_id = value
         self._cur.execute("""SELECT wals_code FROM data_points WHERE feature_id=? AND value_id=?""", (feature_id, value_id))
