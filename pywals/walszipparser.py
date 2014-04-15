@@ -6,13 +6,12 @@ import pywals.sqlmodel as sqlmodel
 def populate_db(cursor, filename):
     zf = zipfile.ZipFile(filename)
     wals_data = parse_wals_data(zf)
-    conn = None
-    sqlmodel.create_tables(conn, cursor)
-    populate_languages_table(wals_data["languages"], conn, cursor)
-    populate_features_table(wals_data["features"], conn, cursor)
-    populate_values_table(wals_data["values"], conn, cursor)
-    populate_data_table(wals_data["datapoints"], conn, cursor)    
-    sqlmodel.create_indices(conn, cursor)
+    sqlmodel.create_tables(cursor)
+    populate_languages_table(wals_data["languages"], cursor)
+    populate_features_table(wals_data["features"], cursor)
+    populate_values_table(wals_data["values"], cursor)
+    populate_data_table(wals_data["datapoints"], cursor)    
+    sqlmodel.create_indices(cursor)
     
 def parse_wals_data(zipfile_handle):
     # Build a data structure representing all the WALS data
@@ -75,19 +74,19 @@ def parse_old_wals_data(zipfile_handle):
         data[filename] = x
     return data
 
-def populate_languages_table(data, conn, cursor):
+def populate_languages_table(data, cursor):
     for datum in data:
         cursor.execute("""INSERT INTO languages VALUES (?, ?, ?, ?, ?, ?, ?,?)""", (unicode(datum["wals code"],"utf8"), unicode(datum["name"],"utf8"), float(datum["latitude"]) if datum["latitude"] else None, float(datum["longitude"]) if datum["longitude"] else None, unicode(datum["genus"],"utf8"), unicode(datum["family"],"utf8"), unicode(datum["subfamily"],"utf8"), unicode(datum["iso codes"],"utf8")))
 
-def populate_features_table(data, conn, cursor):
+def populate_features_table(data, cursor):
     for datum in data:
         cursor.execute("""INSERT INTO features VALUES (?, ?)""", (datum["id"], unicode(datum["name"],"utf8")))
 
-def populate_values_table(data, conn, cursor):
+def populate_values_table(data, cursor):
     for datum in data:
         cursor.execute("""INSERT INTO values_ VALUES (?, ?, ?, ?)""", (datum["feature_id"], int(datum["value_id"]), unicode(datum["description"],"utf8"), unicode(datum["long description"],"utf8")))
 
-def populate_data_table(data, conn, cursor):
+def populate_data_table(data, cursor):
     for datum in data:
         keys = datum.keys()
         keys.remove("wals_code")
