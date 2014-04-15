@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import shutil
 import tempfile
 import urllib2
 
@@ -13,6 +14,7 @@ class WALS:
 
     def __init__(self, dbfile=None, walsfile=None, url=None):
 
+        cleanup_needed = False
         home = os.path.expanduser("~")
         standard_filename = os.path.join(home, ".pywals","wals.db")
 
@@ -35,14 +37,15 @@ class WALS:
         # location and then pretend the user passed in that location
         # as an explicit filename.
         if not dbfile and url:
+            cleanup_needed = True
             tempdir = tempfile.mkdtemp()
-            tmpfile = os.path.join(tempdir, "wals.zip")
+            tmp_filename = os.path.join(tempdir, "wals.zip")
             remote = urllib2.urlopen(url)
-            local = open(tmpfile, "w")
+            local = open(tmp_filename, "w")
             local.write(remote.read())
             remote.close()
             local.close()
-            walsfile = tmpfile
+            walsfile = tmp_filename
 
         # If we've been given an explicit path to a WALS .zip file, use that.
         if not dbfile and walsfile:
@@ -53,9 +56,6 @@ class WALS:
             self._cur = self._conn.cursor()
             walszipparser.populate_db(self._cur, walsfile)
             self._conn.commit()
-        else:
-            # Couldn't get data from anywhere!
-            raise Exception("No data")
 
         # Set default values of all attributes, then call _preprocess
         # to set them appropriately
@@ -66,6 +66,10 @@ class WALS:
         self._value_id_to_name = {}
         self._value_name_to_id = {}
         self._preprocess()
+
+        # Cleanup downloaded files
+        if cleanup_needed:
+            shutil.rmtree(tempdir)
 
     def _preprocess(self):
 
