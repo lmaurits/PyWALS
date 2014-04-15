@@ -44,6 +44,6 @@ def empty_tables(cursor):
     cursor.execute("""DELETE FROM values_""")
 
 def create_indices(cursor):
-    cursor.execute("""CREATE UNIQUE INDEX IF NOT EXISTS lang_name ON languages(name)""");
-    cursor.execute("""CREATE UNIQUE INDEX IF NOT EXISTS lang_family ON languages(family)""");
-    cursor.execute("""CREATE INDEX IF NOT EXISTS data_wals ON data_points(wals_code)""");
+    cursor.execute("""CREATE UNIQUE INDEX IF NOT EXISTS lang_name ON languages(name)""")
+    cursor.execute("""CREATE UNIQUE INDEX IF NOT EXISTS lang_family ON languages(family)""")
+    cursor.execute("""CREATE INDEX IF NOT EXISTS data_wals ON data_points(wals_code)""")
