@@ -99,11 +99,3 @@ def populate_data_table(data, conn, cursor):
             else:
                 value_id = datum[key]
             cursor.execute("""INSERT INTO data_points VALUES (?, ?, ?)""", (wals_code, feature_id, value_id))
-
-def insert_data(wals_dir, conn, cursor):
-    wals_data = parse_wals_data(wals_dir)
-    empty_tables(conn, cursor)
-    populate_languages_table(wals_data["languages"],conn, cursor)
-    populate_features_table(wals_data["features"],conn, cursor)
-    populate_values_table(wals_data["values"],conn, cursor)
-    populate_data_table(wals_data["datapoints"],conn, cursor)    
