@@ -54,8 +54,12 @@ class WALS:
             # Couldn't get data from anywhere!
             raise Exception("No data")
 
+        self.language_count = 0
+        self.feature_count = 0
         self._feature_id_to_name = {}
         self._feature_name_to_id = {}
+        self._value_id_to_name = {}
+        self._value_name_to_id = {}
         self._preprocess()
 
     def _preprocess(self):
@@ -67,8 +71,6 @@ class WALS:
         for id_, name in self._cur.fetchall():
             self._feature_id_to_name[id_] = name
             self._feature_name_to_id[name] = id_
-        self._value_id_to_name = {}
-        self._value_name_to_id = {}
         self._cur.execute('''SELECT feature_id, value_id, long_desc FROM values_''')
         for feature_id, value_id, name in self._cur.fetchall():
             if feature_id not in self._value_id_to_name:

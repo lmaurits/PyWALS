@@ -5,12 +5,13 @@ class Language:
         self.parent = parent_WALS
         self._cur = self.parent._cur
         self.code = None
+        self.iso_codes = None
         self.name = "Unknown"
         self.location = (0.0, 0.0)
         self.family = "Unknown"
         self.subfamily = "Unknown"
         self.genus = "Unknown"
-        self.data = {}
+        self.features = {}
 
     def get_family_members(self):
 
