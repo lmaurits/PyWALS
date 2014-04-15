@@ -13,11 +13,12 @@ class WALS:
 
     def __init__(self, dbfile=None, walsfile=None, url=None):
 
+        home = os.path.expanduser("~")
+        standard_filename = os.path.join(home, ".pywals","wals.db")
+
         if not dbfile and not walsfile and not url:
             # We've been given no explicit location for WALS data
             # Is there already a database in the home directory?
-            home = os.path.expanduser("~")
-            standard_filename = os.path.join(home, ".pywals","wals.db")
             if os.path.exists(standard_filename):
                 # Yes, use it
                 dbfile = standard_filename
@@ -25,14 +26,15 @@ class WALS:
                 # No, try to download from wals.info
                 url = "http://wals.info/static/download/wals-language.csv.zip"
 
+        # If we've been given an explicit SQLite file, use that.
         if dbfile:
             self._conn = sqlite3.connect(dbfile)
             self._cur = self._conn.cursor()
-            self._preprocess()
-            return
 
-        if url:
-            # Download WALS zip file to temporary location
+        # If we've been given a URL, download the file to a temporary
+        # location and then pretend the user passed in that location
+        # as an explicit filename.
+        if not dbfile and url:
             tempdir = tempfile.mkdtemp()
             tmpfile = os.path.join(tempdir, "wals.zip")
             remote = urllib2.urlopen(url)
@@ -42,11 +44,9 @@ class WALS:
             local.close()
             walsfile = tmpfile
 
-        if walsfile:
-            # Create a new database in the standard location and populate it
-            # from the indicated zip file
-            home = os.path.expanduser("~")
-            standard_filename = os.path.join(home, ".pywals","wals.db")
+        # If we've been given an explicit path to a WALS .zip file, use that.
+        if not dbfile and walsfile:
+            # Create a new database in the standard location
             if not os.path.exists(os.path.dirname(standard_filename)):
                 os.makedirs(os.path.dirname(standard_filename))
             self._conn = sqlite3.connect(standard_filename)
@@ -57,6 +57,8 @@ class WALS:
             # Couldn't get data from anywhere!
             raise Exception("No data")
 
+        # Set default values of all attributes, then call _preprocess
+        # to set them appropriately
         self.language_count = 0
         self.feature_count = 0
         self._feature_id_to_name = {}
