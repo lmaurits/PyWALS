@@ -54,6 +54,8 @@ class WALS:
             # Couldn't get data from anywhere!
             raise Exception("No data")
 
+        self._feature_id_to_name = {}
+        self._feature_name_to_id = {}
         self._preprocess()
 
     def _preprocess(self):
@@ -61,8 +63,6 @@ class WALS:
         self._update_counts()
 
     def _build_translations(self):
-        self._feature_id_to_name = {}
-        self._feature_name_to_id = {}
         self._cur.execute('''SELECT id, name FROM features''')
         for id_, name in self._cur.fetchall():
             self._feature_id_to_name[id_] = name
