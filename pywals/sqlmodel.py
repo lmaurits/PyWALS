@@ -66,5 +66,5 @@ def create_indices(cursor):
     """Create various database indicies if they don't already exist."""
 
     cursor.execute("""CREATE UNIQUE INDEX IF NOT EXISTS lang_name ON languages(name)""")
-    cursor.execute("""CREATE UNIQUE INDEX IF NOT EXISTS lang_family ON languages(family)""")
+    cursor.execute("""CREATE INDEX IF NOT EXISTS lang_family ON languages(family)""")
     cursor.execute("""CREATE INDEX IF NOT EXISTS data_wals ON data_points(wals_code)""")
