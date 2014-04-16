@@ -183,7 +183,7 @@ class WALS:
         """Return a list of all feature names in the database."""
 
         self._cur.execute("""SELECT name FROM features""")
-        return self._cur.fetchall()
+        return [f[0] for f in self._cur.fetchall()]
 
     def get_feature_distribution(self, feature, family=None):
 
