@@ -178,6 +178,13 @@ class WALS:
     # FEATURE RELATED STUFF
     ##############################
 
+    def get_all_features(self):
+
+        """Return a list of all feature names in the database."""
+
+        self._cur.execute("""SELECT name FROM features""")
+        return self._cur.fetchall()
+
     def get_feature_distribution(self, feature, family=None):
 
         """Return a tuple structure representing the distribution over
@@ -185,7 +192,7 @@ class WALS:
         distribution for languages in that family only."""
        
         if family:
-            self._cur.execute("""SELECT value_id, COUNT(value_id) as count FROM data_points WHERE feature_id=? AND wals_code IN (SELECT wals_code FROM languages WHERE family=?)GROUP BY value_id ORDER BY count DESC""", (feature,family))
+            self._cur.execute("""SELECT value_id, COUNT(value_id) as count FROM data_points WHERE feature_id=? AND wals_code IN (SELECT wals_code FROM languages WHERE family=?)GROUP BY value_id ORDER BY count DESC""", (feature, family))
         else:
             self._cur.execute("""SELECT value_id, COUNT(value_id) as count FROM data_points WHERE feature_id=? GROUP BY value_id ORDER BY count DESC""", (feature,))
         dist = self._cur.fetchall()
