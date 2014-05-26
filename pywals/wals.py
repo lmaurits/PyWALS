@@ -139,9 +139,9 @@ class WALS:
         languages in WALS."""
 
         self._cur.execute("""SELECT wals_code FROM languages""")
-        code = self._cur.fetchone()[0]
-        language = self._lang_from_code(code)
-        return language
+        codes = [code[0] for code in self._cur.fetchall()]
+        languages = [self._lang_from_code(code) for code in codes]
+        return languages
 
     def get_language_by_name(self, name):
 
