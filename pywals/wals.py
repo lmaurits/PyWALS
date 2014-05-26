@@ -198,3 +198,12 @@ class WALS:
         dist = self._cur.fetchall()
         dist = [(self._value_id_to_name[feature][value], count) for value, count in dist]
         return dist
+
+    def get_feature_language_count(self, feature):
+
+        """Return the number of languages for which there is data bout
+        the given feature."""
+
+        feature_id = self._feature_name_to_id[feature]
+        self._cur.execute("""SELECT COUNT(wals_code) FROM data_points WHERE feature_id=?""", (feature_id,))
+        return self._cur.fetchone()[0]
