@@ -10,6 +10,7 @@ class Language:
         self._cur = self.parent._cur
         self.code = None
         self.iso_codes = None
+        self.glottocode = None
         self.name = "Unknown"
         self.location = (0.0, 0.0)
         self.family = "Unknown"

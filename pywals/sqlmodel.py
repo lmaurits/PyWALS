@@ -10,7 +10,8 @@ def create_languages_table(cursor):
                 genus TEXT,
                 family TEXT,
                 subfamily TEXT,
-                iso_codes TEXT)''')
+                iso_codes TEXT,
+                glottocode TEXT)''')
 
 def create_features_table(cursor):
 

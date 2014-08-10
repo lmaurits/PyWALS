@@ -122,6 +122,7 @@ class WALS:
         lang.family = results[5]
         lang.subfamily = results[6]
         lang.iso_codes = results[7]
+        lang.glottocode = results[8]
 
         lang.features = {}
         self._cur.execute('''SELECT feature_id, value_id FROM data_points WHERE wals_code=?''',(code,))
